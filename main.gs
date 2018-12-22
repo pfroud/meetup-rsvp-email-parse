@@ -1,3 +1,6 @@
+/**
+called when an email is opened. specified in the manifest.
+**/
 function handleContextualTrigger(e) {
   const accessToken = e.messageMetadata.accessToken;
   GmailApp.setCurrentMessageAccessToken(accessToken);
@@ -36,9 +39,8 @@ function handleContextualTrigger(e) {
     CardService.newTextButton().setText("parse RSVP emails")
     .setOnClickAction(
       CardService.newAction()
-      //      .setFunctionName("actionResponseShowNotification")
       .setFunctionName("actionResponsePushCard")
-      //      .setParameters({notificationMessage: "pressed button"})
+      .setParameters({eventName: "whatever"})
     )
   );
   
@@ -52,14 +54,26 @@ function handleContextualTrigger(e) {
   
 }
 
-function actionResponsePushCard(){
+function actionResponsePushCard(e){
+  
+  //e.parameters.eventName
+  
+  const parsed = parseAllEmails();
   
   const header = CardService.newCardHeader()
-  .setTitle("push card")
+  .setTitle("Results")
   .setImageUrl("https://cdn1.iconfinder.com/data/icons/iconza-circle-social/64/697072-meetup-128.png");
   
   const section = CardService.newCardSection();
-  addTextWidgetToSection(section, "action response push card");
+  
+  
+  parsed.forEach(function(rsvpObj){
+    addTextWidgetToSection(section,
+                           "<b>date:</b> " + rsvpObj.date + "<br><b>name:</b> " + rsvpObj.name + "<br><b>rsvp:</b> " + rsvpObj.rsvp + "<br><b>isUpdate:</b> " + rsvpObj.isUpdate
+                          );
+  });
+  
+  
   
   const card = CardService.newCardBuilder().setHeader(header).addSection(section).build();
   
@@ -71,44 +85,6 @@ function actionResponsePushCard(){
 }
 
 
-function actionResponseShowNotification(e){
-  return CardService.newActionResponseBuilder().setNotification(
-    CardService.newNotification()
-    .setText(e.parameters.notificationMessage)
-  ).build();
-}
 
-function getOpenLink(url){
-  return CardService.newOpenLink().setUrl(url);
-}
 
-function stringContains(wholeThing, searchFor){
-  return wholeThing.indexOf(searchFor) > -1;
-}
 
-function addTextWidgetToSection(section, message){
-  section.addWidget(CardService.newTextParagraph().setText(message));
-}
-
-function parseEmail(){
-  const eventName = "ar/vr party"
-  const searchQuery = "subject:(latest RSVPs for "+eventName+") OR subject:(RSVPed to "+eventName+")";
-  const threads = GmailApp.search(searchQuery);
-  
-  threads.forEach(function (thread){
-    thread.getMessages().forEach(function(message){
-      const plainBody = message.getPlainBody();
-    })
-  });
-  
-  const widgetText = CardService.newTextParagraph().setText("Search query <b>\""+searchQuery+"\"</b> returned "+threads.length +" threads.");
-  
-  
-  const plainBody = threads[0].getMessages()[0].getPlainBody();
-  
-  
-}
-
-function getStringBetween(input, before, after) {
-  return input.split(before)[1].split(after)[0];
-}
