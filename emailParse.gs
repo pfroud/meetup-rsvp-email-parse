@@ -1,58 +1,64 @@
-function parseAllEmails(){
-  const eventName = "vr/ar party"
+function parseAllEmails(eventName){
   const searchQuery = "from:info@meetup.com AND (subject:(latest RSVPs for "+eventName+") OR subject:(RSVPed to "+eventName+"))";
   const threads = GmailApp.search(searchQuery);
   
-  //  Logger.log("query: \""+searchQuery+"\"");
-  //  Logger.log("number of threads returned by search: "+threads.length);
+  const threadCount = threads.length;
   
   
-  /*
+  var rv = [];
+  
   threads.forEach(function (thread){
-  thread.getMessages().forEach(function(message){      
-  const rv = parseMessage(message);
-  })
+    thread.getMessages().forEach(function(message){      
+      rv = rv.concat(parseMessage(message));
+    })
   });
-  */
+  return rv;
   
-  return parseMessage(threads[0].getMessages()[0]);
+  
+  //return parseMessage(threads[0].getMessages()[0]);
+  
+//  return parseMessage(GmailApp.getMessageById("16752b24b28f3fdd"));
   
 }
 
 
 function parseMessage(gmailMessage){
-  const messageDate = gmailMessage.getDate();
   const rsvpsString = getStringBetween(gmailMessage.getPlainBody().trim(), "\n----\n\n", "View full RSVP list").trim();
   
-  const splitRsvpGroups = rsvpsString.split("\n\n")
+  const splitRsvpGroups = rsvpsString.split("\n\n");
   
-  const count = splitRsvpGroups.length;
+
+  const groupCount = splitRsvpGroups.length;
   
-  var rv = new Array(count);
+  var rv = new Array(groupCount);
   
-  for(var i = 0; i < count-1; i++) {
-    rv[i] = parseRsvpGroup(splitRsvpGroups[i], messageDate, false);
+  for(var i = 0; i < groupCount-1; i++) {
+    rv[i] = parseRsvpGroup(splitRsvpGroups[i], gmailMessage, false);
   }
   
-  rv[count-1] = parseRsvpGroup(splitRsvpGroups[count-1], messageDate, true);
+  rv[groupCount-1] = parseRsvpGroup(splitRsvpGroups[groupCount-1], gmailMessage, true);
   
   return rv;
 }
 
-function parseRsvpGroup(rsvpGroupString, messageDate, isLastRow){
+function parseRsvpGroup(rsvpGroupString, gmailMessage, isLastRow){
+  
   
   if(isLastRow){
     // index where "x Cool weirdos are going to this Meetup" starts
-    const idx = rsvpGroupString.search(/\d+Cool weirdo/);
+    const idx = rsvpGroupString.search(/\d+ Cool weirdo/);
     if(idx > -1){
-      rsvpGroupString = rsvpGroupString.substring(0, idx);
+      rsvpGroupString = rsvpGroupString.substring(0, idx).trim();
     }
   }
   
   const splitLines = rsvpGroupString.trim().split("\n");
   
+  
   var rv = parseRsvpLine(splitLines[1]);
-  rv.date = parseDateLine(splitLines[0], messageDate);
+  rv.rsvpDate = parseDateLine(splitLines[0], gmailMessage.getDate());
+  rv.messageID = gmailMessage.getId();
+  rv.messageDate = gmailMessage.getDate().toString();
   return rv;
   
 }
@@ -62,7 +68,7 @@ function parseDateLine(dateString, messageDate){
 }
 
 function parseRsvpLine(rsvpString){
-  rsvpString = rsvpString.replace(/\-+/, "");
+  rsvpString = rsvpString.replace(/\-+/, "").replace(", First Timer,", "");
   
   var name, newRsvp, isUpdate;
   
@@ -74,13 +80,11 @@ function parseRsvpLine(rsvpString){
   
   
   for(var i=0; i<delimiters.length; i++){
-    const delim = delimiters[i];
-    
+    var delim = delimiters[i];
     if(stringContains(rsvpString, delim)){
       const splitDelim = rsvpString.split(delim);
       name = splitDelim[0];
       newRsvp = splitDelim[1];
-      
       isUpdate = stringContains(delim, "updated");
       break;
     }

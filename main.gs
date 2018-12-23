@@ -10,7 +10,7 @@ function handleContextualTrigger(e) {
   
   var section = CardService.newCardSection();
   
-  var textInput = CardService.newTextInput().setFieldName("textInputEventName").setTitle("Event name");
+  var textInput = CardService.newTextInput().setFieldName("eventName").setTitle("Event name");
   
   if(message.getFrom() == '"Silicon Valley Offbeat Fun for 20s & 30s" <info@meetup.com>'){
     if(stringContains(subject, "Latest RSVPs for")){
@@ -38,9 +38,7 @@ function handleContextualTrigger(e) {
   section.addWidget(
     CardService.newTextButton().setText("parse RSVP emails")
     .setOnClickAction(
-      CardService.newAction()
-      .setFunctionName("actionResponsePushCard")
-      .setParameters({eventName: "whatever"})
+      CardService.newAction().setFunctionName("actionResponsePushCard")
     )
   );
   
@@ -56,23 +54,44 @@ function handleContextualTrigger(e) {
 
 function actionResponsePushCard(e){
   
-  //e.parameters.eventName
-  
-  const parsed = parseAllEmails();
-  
   const header = CardService.newCardHeader()
   .setTitle("Results")
   .setImageUrl("https://cdn1.iconfinder.com/data/icons/iconza-circle-social/64/697072-meetup-128.png");
   
   const section = CardService.newCardSection();
   
+  const eventName = e.formInput.eventName.trim();
   
-  parsed.forEach(function(rsvpObj){
-    addTextWidgetToSection(section,
-                           "<b>date:</b> " + rsvpObj.date + "<br><b>name:</b> " + rsvpObj.name + "<br><b>rsvp:</b> " + rsvpObj.rsvp + "<br><b>isUpdate:</b> " + rsvpObj.isUpdate
-                          );
-  });
+  if(eventName.length > 0){
   
+    const parsed = parseAllEmails(eventName);
+    
+    /*
+    parsed.forEach(function(rsvpObj){
+      addTextWidgetToSection(
+        section,
+        "<b>date:</b> " + rsvpObj.date +
+        "<br><b>name:</b> " + rsvpObj.name + 
+        "<br><b>rsvp:</b> " + rsvpObj.rsvp + 
+        "<br><b>isUpdate:</b> " + rsvpObj.isUpdate
+      );
+    });
+    */
+    
+    
+    addTextWidgetToSection(section, "Here's the output:");
+    section.addWidget(CardService.newTextInput().setMultiline(true).setFieldName("output").setValue(JSON.stringify(parsed)));
+    
+    
+    /*
+    addTextWidgetToSection(section, "Array length is "+parsed.length+", if this is okay click the button below.");
+    const url = "https://pfroud.com/meetup-rsvp-email-parser/?data=" + encodeURIComponent(JSON.stringify(parsed));
+    section.addWidget(CardService.newTextButton().setText("send results to grapher").setOpenLink(getOpenLink(url)));
+    */
+    
+  } else {
+    addTextWidgetToSection(section, "The event name is empty");
+  }
   
   
   const card = CardService.newCardBuilder().setHeader(header).addSection(section).build();
