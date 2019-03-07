@@ -22,7 +22,9 @@ The emails have `Content-Type: multipart/alternative`. There are two parts, one 
 
 Here is a screenshot of an RSVP email. Note the email was sent on December 8th.
 
-![screnshot of complicated rsvp email](img/email-many-rsvps.png)
+<table><tr><td>
+<img alt="screnshot of complicated rsvp email" src="img/email-many-rsvps.png">
+</td></tr></table>
 
 And here's the important part of the plaintext version:
 
@@ -55,12 +57,13 @@ So, let's go back to when Han first RSVPd. The email is from November 21st.
 https://mail.google.com/mail/u/0/?zx=vis93knbpjz1#inbox/FMfcgxvzLhkmPHSJTNWNzQsRBrBFlkDv
 -->
 
-![screensoht of Han email](img/email-Han-only.png)
+<table><tr><td>
+<img alt="screenshot of Han email" src="img/email-Han-only.png">
+</td></tr></table>
 
 ```
 Nov 21, 6:07 PM
 Han was added to the Waitlist
-
 ```
 
 And back to when Kairi first RSVPd. The email is from November 24th.
@@ -69,7 +72,9 @@ And back to when Kairi first RSVPd. The email is from November 24th.
 https://mail.google.com/mail/u/0/?zx=vis93knbpjz1#inbox/FMfcgxvzLrCkCmhdKwSnnCxgzHWlgcJL
 -->
 
-![screenshot of Kairi email](img/email-Kairi-only.png)
+<table><tr><td>
+<img alt="screenshot of Kairi email" src="img/email-Kairi-only.png">
+</td></tr></table>
 
 ```
 Nov 24, 10:40 AM
