@@ -9,9 +9,9 @@
     "name": "Meetup RSVP Email Parser by Peter Froud",
     "logoUrl": "https://cdn1.iconfinder.com/data/icons/iconza-circle-social/64/697072-meetup-128.png",
     "contextualTriggers": [{
-    "unconditional": {},
-      "onTriggerFunction": "handleContextualTrigger"
-    }],
+      "unconditional": {},
+        "onTriggerFunction": "handleContextualTrigger"
+      }],
    
     "openLinkUrlPrefixes": ["https://pfroud.com/"]
   }
